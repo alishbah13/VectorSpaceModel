@@ -3,6 +3,7 @@ from nltk.tokenize import RegexpTokenizer, word_tokenize
 from collections import defaultdict
 import json
 import math
+import numpy as np
 
 
 class vector_space_model:
@@ -18,6 +19,7 @@ class vector_space_model:
                             31:[], 32:[], 33:[], 34:[], 35:[], 36:[], 37:[], 38:[], 39:[], 40:[],
                             41:[], 42:[], 43:[], 44:[], 45:[], 46:[], 47:[], 48:[], 49:[], 50:[]
                             }
+        self.query = []
 
 
     
@@ -76,8 +78,8 @@ class vector_space_model:
     def tf_idf(self, query):
         #form partial doc vectors
         # print( self.index)
-        query = list( query.split(" ") )
-        for term in query:
+        self.query = list( query.split(" ") )
+        for term in self.query:
             df = self.index[term][0]
             idf = math.log( 50/df , 10)
 
@@ -89,11 +91,40 @@ class vector_space_model:
                 else:
                     self.doc_vectors[i].append(0)
         
-        return self.doc_vectors
+        return self.query, self.doc_vectors
     
     def cosine_sim(self):
+        ranks = {}
+        query_mag = 1 
+        query_vec = [1 * len(self.query) ]
+        #considering query vector as a vector of 1s since all query words are assumed to be present in the dictionary
         for i in range(1,51):
             # self.doc_vectors[i]
+            doc = self.doc_vectors[i]
+            doc_mag = sum( np.square(doc) )
+            if doc_mag > 0:
+                cross_prod = np.multiply( query_vec, doc ).sum()
+
+                score = cross_prod / (doc_mag * query_mag) 
+            else:
+                score = 0
+        
+            ranks[i] = score
+
+        result = sorted(ranks.items(), key=lambda item: item[1] , reverse=True)
+        result = [x[0] for x in result if x[1] >= 0.05]
+
+        # return result
+
+        titles = []
+        for ids in result:
+            with open( 'ShortStories' + "/" + str(ids) + ".txt","r") as file:
+                titles.append( file.readline() + " " +str(ids) )
+        
+        return titles
+
+
+
 
                 
 
@@ -104,4 +135,5 @@ x.get_raw_text('ShortStories')
 x.preprocess()
 x.set_index() 
 x.store_index()
-print(x.tf_idf('write and play'))
+print(x.tf_idf('front of the lodge faces the hospital'))
+print(*x.cosine_sim(), sep="\n")
