@@ -119,7 +119,7 @@ class vector_space_model:
         titles = []
         for ids in result:
             with open( 'ShortStories' + "/" + str(ids) + ".txt","r") as file:
-                titles.append( file.readline() + " " +str(ids) )
+                titles.append( [str(ids),  file.readline() ] )
         
         return titles
 
@@ -129,11 +129,11 @@ class vector_space_model:
                 
 
 
-x = vector_space_model()
-x.get_files('ShortStories')
-x.get_raw_text('ShortStories')
-x.preprocess()
-x.set_index() 
-x.store_index()
-print(x.tf_idf('front of the lodge faces the hospital'))
-print(*x.cosine_sim(), sep="\n")
+# x = vector_space_model()
+# x.get_files('ShortStories')
+# x.get_raw_text('ShortStories')
+# x.preprocess()
+# x.set_index() 
+# x.store_index()
+# print(x.tf_idf('front of the lodge faces the hospital'))
+# print(*x.cosine_sim(), sep="\n")
