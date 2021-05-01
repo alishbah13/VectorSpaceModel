@@ -95,7 +95,7 @@ class vector_space_model:
     
     def cosine_sim(self):
         ranks = {}
-        query_mag = 1 
+        query_mag = math.sqrt( 1 * len(self.query) ) 
         query_vec = [1 * len(self.query) ]
         #considering query vector as a vector of 1s since all query words are assumed to be present in the dictionary
         for i in range(1,51):
@@ -111,10 +111,12 @@ class vector_space_model:
         
             ranks[i] = score
 
-        result = sorted(ranks.items(), key=lambda item: item[1] , reverse=True)
+        result = sorted(ranks.items(), key=lambda item: item[1] , reverse=False)
+        # print(*ranks, sep='\n')
         result = [x[0] for x in result if x[1] >= 0.05]
 
         # return result
+        # print(*result, sep='\n')
 
         titles = []
         for ids in result:
